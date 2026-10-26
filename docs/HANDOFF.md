@@ -119,3 +119,7 @@ Backend tests and `node scripts/test-indexer-process.mjs` use the local Hardhat 
 - Isolated backend tests with a dedicated ephemeral Hardhat node on `127.0.0.1:8545`, deploying `ExamVault` to `localhost` and dynamically injecting `CONTRACT_ADDRESS`, `DEPLOY_BLOCK`, `RPC_URL`, `CHAIN_ID`, and test database/session parameters into `@sigil/backend test`. Cleaned up the deployment artifact and terminated the node on exit.
 - Preserved `test:auth-matrix` and `test-indexer-process` as opt-in verification suites run separately with their dedicated lifecycle runners.
 
+## Cross-platform storage path validation fix (BE-05)
+
+- Added `isValidStoragePath` in `backend/src/routes/exams.ts` to validate stored blob paths before any filesystem calls. Rejects paths that are absolute, contain `..` segments, contain backslashes (`\`), or contain NUL bytes, and enforces separator-aware prefix containment within `BLOB_DIR` returning HTTP 400 `INVALID_STORAGE_PATH`. This resolves a Linux CI failure where `..\outside.bin` was treated as a literal file name on POSIX rather than directory traversal, throwing `ENOENT` during `realpath` and returning 404 `BLOB_NOT_FOUND`.
+- Added test cases in `backend/test/batches.test.ts` verifying rejection with HTTP 400 `INVALID_STORAGE_PATH` for `"../x"`, `"..\\x"`, and absolute paths, while preserving HTTP 404 `BLOB_NOT_FOUND` for genuinely missing files.

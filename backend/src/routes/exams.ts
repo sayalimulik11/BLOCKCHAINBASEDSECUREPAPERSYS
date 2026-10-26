@@ -25,15 +25,39 @@ function isPathInside(rootPath: string, candidatePath: string): boolean {
   );
 }
 
+function isValidStoragePath(blobDir: string, blobPath: string): boolean {
+  if (!blobPath || typeof blobPath !== "string") {
+    return false;
+  }
+  if (blobPath.includes("\0") || blobPath.includes("\\")) {
+    return false;
+  }
+  if (path.isAbsolute(blobPath) || blobPath.startsWith("/") || /^[a-zA-Z]:/.test(blobPath)) {
+    return false;
+  }
+  const segments = blobPath.split(/[/\\]/);
+  if (segments.some((segment) => segment === "..")) {
+    return false;
+  }
+  const blobRoot = path.resolve(blobDir);
+  const candidatePath = path.resolve(blobRoot, blobPath);
+  const rootWithSep = blobRoot.endsWith(path.sep) ? blobRoot : `${blobRoot}${path.sep}`;
+  if (!candidatePath.startsWith(rootWithSep) || !isPathInside(blobRoot, candidatePath)) {
+    return false;
+  }
+  return true;
+}
+
 async function getSafeBlobPath(blobDir: string, blobPath: string): Promise<string | null> {
-  if (!blobPath || path.isAbsolute(blobPath)) return null;
+  if (!isValidStoragePath(blobDir, blobPath)) return null;
 
   const rootPath = await realpath(blobDir);
+  const rootWithSep = rootPath.endsWith(path.sep) ? rootPath : `${rootPath}${path.sep}`;
   const candidatePath = path.resolve(rootPath, blobPath);
-  if (!isPathInside(rootPath, candidatePath)) return null;
+  if (!candidatePath.startsWith(rootWithSep) || !isPathInside(rootPath, candidatePath)) return null;
 
   const actualPath = await realpath(candidatePath);
-  if (!isPathInside(rootPath, actualPath)) return null;
+  if (!actualPath.startsWith(rootWithSep) || !isPathInside(rootPath, actualPath)) return null;
 
   const details = await stat(actualPath);
   return details.isFile() ? actualPath : null;
@@ -425,6 +449,12 @@ export function createExamsRouter(
         }
 
         const cfg = getConfigFn();
+        if (!isValidStoragePath(cfg.BLOB_DIR, batch.blobPath)) {
+          return res.status(400).json({
+            error: { code: "INVALID_STORAGE_PATH", message: "Batch storage path is invalid" },
+          });
+        }
+
         let fullPath: string | null;
         try {
           fullPath = await getSafeBlobPath(cfg.BLOB_DIR, batch.blobPath);
