@@ -9,7 +9,12 @@ import type { Config } from "../config.js";
 function serializeArgs(args: any): any {
   if (typeof args === "bigint") return args.toString();
   if (args === null || args === undefined) return args;
-  if (Array.isArray(args)) return args.map(serializeArgs);
+  if (Array.isArray(args)) {
+    if (typeof args.toObject === "function") {
+      return serializeArgs(args.toObject());
+    }
+    return args.map(serializeArgs);
+  }
   if (typeof args === "object") {
     const out: Record<string, any> = {};
     for (const [k, v] of Object.entries(args)) {

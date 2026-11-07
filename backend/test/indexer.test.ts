@@ -270,6 +270,14 @@ describe("ExamVault Event Indexer (BE-07)", () => {
     expect(exam).toBeDefined();
     expect(exam.state).toBe(0); // Draft
     expect(exam.threshold).toBe(2);
+    const registration = Array.from(tables.chainEvents.values()).find(
+      (event) => event.type === "ParticipantRegistered"
+    );
+    expect(registration?.payloadJson).toEqual({
+      account: authorityAddr,
+      role: "1",
+      profileHash: ethers.ZeroHash,
+    });
 
     const panel = await db.panelMember.findMany();
     expect(panel.length).toBe(5); // 3 holders + 1 setter + 1 centre

@@ -1,10 +1,12 @@
 import { Router, type Request, type Response } from "express";
 import { ethers } from "ethers";
+import { ExamVaultABI } from "@sigil/contracts-types";
 import { schemas } from "@sigil/core";
 import { prisma } from "../db.js";
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
+const eventInterface = new ethers.Interface(ExamVaultABI);
 
 interface EventCursor {
   blockNumber: bigint;
@@ -44,6 +46,19 @@ function encodeCursor(event: { blockNumber: bigint; logIndex: number }): string 
   return Buffer.from(
     JSON.stringify({ blockNumber: event.blockNumber.toString(), logIndex: event.logIndex })
   ).toString("base64url");
+}
+
+function normalizeEventPayload(type: string, payload: unknown): unknown {
+  if (!Array.isArray(payload)) return payload;
+
+  const fragment = eventInterface.getEvent(type);
+  if (!fragment || fragment.inputs.length !== payload.length) {
+    throw new Error(`Cannot normalize payload for ${type}`);
+  }
+
+  return Object.fromEntries(
+    fragment.inputs.map((input, index) => [input.name, payload[index]])
+  );
 }
 
 export function createEventsRouter() {
@@ -149,6 +164,7 @@ export function createEventsRouter() {
       const events = page.map((event: any) => ({
         ...event,
         blockNumber: event.blockNumber.toString(),
+        payloadJson: normalizeEventPayload(event.type, event.payloadJson),
         blockTimestamp: event.blockTimestamp.toString(),
       }));
       const lastEvent = page.at(-1);

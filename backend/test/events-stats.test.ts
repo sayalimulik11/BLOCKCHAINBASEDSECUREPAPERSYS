@@ -177,6 +177,27 @@ describe("Events and dashboard stats (BE-08)", () => {
     expect(lastPage.body.nextCursor).toBeNull();
   });
 
+  it("returns legacy positional event payloads as objects keyed by ABI argument names", async () => {
+    const payloadJson = [authority.address, "1", ethers.ZeroHash];
+    indexedEvents[0] = {
+      ...indexedEvents[0],
+      type: "ParticipantRegistered",
+      payloadJson,
+    };
+
+    const response = await request(createApp(config, undefined, contract)).get("/api/events");
+    const event = response.body.events.find(
+      (item: any) => item.type === "ParticipantRegistered"
+    );
+
+    expect(event.payloadJson).toEqual({
+      account: authority.address,
+      role: "1",
+      profileHash: ethers.ZeroHash,
+    });
+    expect(schemas.ChainEventResponseSchema.safeParse(event).success).toBe(true);
+  });
+
   it("rejects invalid pagination and time range edge cases", async () => {
     const app = createApp(config, undefined, contract);
     expect((await request(app).get("/api/events?limit=0")).body.error.code).toBe("INVALID_LIMIT");

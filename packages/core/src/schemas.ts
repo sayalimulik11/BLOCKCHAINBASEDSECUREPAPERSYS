@@ -117,7 +117,15 @@ export const ChainEventResponseSchema = z.object({
   examId: z.string().nullable(),
   type: z.string(),
   actor: address.nullable(),
-  payloadJson: z.unknown(),
+  payloadJson: z.record(z.string(), z.unknown()).meta({
+    description:
+      "Event arguments keyed by their ABI parameter names. For ParticipantRegistered: { account, role, profileHash }.",
+    example: {
+      account: "0x0000000000000000000000000000000000000001",
+      role: "1",
+      profileHash: `0x${"0".repeat(64)}`,
+    },
+  }),
   blockTimestamp: z.string().regex(/^\d+$/)
 });
 export const EventsResponseSchema = z.object({

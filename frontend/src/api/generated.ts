@@ -1416,7 +1416,10 @@ export interface paths {
                                 examId: string | null;
                                 type: string;
                                 actor: string | null;
-                                payloadJson?: unknown;
+                                /** @description Event arguments keyed by their ABI parameter names. For ParticipantRegistered: { account, role, profileHash }. */
+                                payloadJson: {
+                                    [key: string]: unknown;
+                                };
                                 blockTimestamp: string;
                             }[];
                             nextCursor: string | null;
