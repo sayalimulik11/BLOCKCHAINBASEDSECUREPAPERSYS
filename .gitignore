@@ -36,3 +36,5 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+docs/e2e-screenshots/

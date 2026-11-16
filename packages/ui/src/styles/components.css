@@ -1,0 +1,731 @@
+/* Component Styles for SIGIL Security Paper Design System */
+
+/* --- Button --- */
+.sigil-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sigil-space-2);
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-base);
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: var(--sigil-radius-button);
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  white-space: nowrap;
+}
+
+.sigil-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.sigil-button--sm {
+  padding: var(--sigil-space-1) var(--sigil-space-2);
+  font-size: var(--sigil-font-size-xs);
+  height: 28px;
+}
+
+.sigil-button--md {
+  padding: var(--sigil-space-2) var(--sigil-space-4);
+  font-size: var(--sigil-font-size-base);
+  height: 38px;
+}
+
+.sigil-button--lg {
+  padding: var(--sigil-space-3) var(--sigil-space-6);
+  font-size: var(--sigil-font-size-md);
+  height: 46px;
+}
+
+/* Variants */
+.sigil-button--primary {
+  background-color: var(--sigil-color-ink);
+  color: var(--sigil-color-sheet);
+  border-color: var(--sigil-color-ink);
+}
+
+.sigil-button--primary:hover:not(:disabled) {
+  background-color: #1a3c5e;
+}
+
+.sigil-button--secondary {
+  background-color: transparent;
+  color: var(--sigil-color-ink);
+  border-color: var(--sigil-color-ink);
+}
+
+.sigil-button--secondary:hover:not(:disabled) {
+  background-color: var(--sigil-color-mist);
+}
+
+.sigil-button--ghost {
+  background-color: transparent;
+  color: var(--sigil-color-ink);
+  border-color: transparent;
+}
+
+.sigil-button--ghost:hover:not(:disabled) {
+  background-color: var(--sigil-color-mist);
+}
+
+.sigil-button--alert {
+  background-color: var(--sigil-color-alert);
+  color: var(--sigil-color-sheet);
+  border-color: var(--sigil-color-alert);
+}
+
+.sigil-button--alert:hover:not(:disabled) {
+  background-color: #922b21;
+}
+
+/* --- Field & Input --- */
+.sigil-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sigil-space-1);
+  margin-bottom: var(--sigil-space-3);
+  width: 100%;
+}
+
+.sigil-field__label {
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-xs);
+  font-weight: 600;
+  color: var(--sigil-color-ink);
+}
+
+.sigil-field__description {
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-slate);
+  margin: 0;
+}
+
+.sigil-input,
+.sigil-textarea,
+.sigil-select-trigger {
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-base);
+  color: var(--sigil-color-ink);
+  background-color: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+  border-radius: var(--sigil-radius-input);
+  padding: var(--sigil-space-2) var(--sigil-space-3);
+  width: 100%;
+  transition: border-color 0.15s ease;
+}
+
+.sigil-input:focus,
+.sigil-textarea:focus,
+.sigil-select-trigger:focus {
+  border-color: var(--sigil-color-marigold);
+  outline: var(--sigil-focus-outline);
+  outline-offset: 1px;
+}
+
+.sigil-input--mono {
+  font-family: var(--sigil-font-mono);
+}
+
+.sigil-field-error {
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-alert);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* --- Select --- */
+.sigil-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  height: 38px;
+}
+
+.sigil-select-content {
+  background-color: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+  border-radius: var(--sigil-radius-popover);
+  box-shadow: var(--sigil-shadow-popover);
+  padding: var(--sigil-space-1);
+  min-width: 160px;
+  z-index: 50;
+}
+
+.sigil-select-item {
+  display: flex;
+  align-items: center;
+  padding: var(--sigil-space-2) var(--sigil-space-3);
+  font-size: var(--sigil-font-size-base);
+  color: var(--sigil-color-ink);
+  cursor: pointer;
+  border-radius: 2px;
+  outline: none;
+}
+
+.sigil-select-item[data-highlighted] {
+  background-color: var(--sigil-color-mist);
+  color: var(--sigil-color-ink);
+}
+
+/* --- Dialog & Popover --- */
+.sigil-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 39, 64, 0.45);
+  z-index: 100;
+}
+
+.sigil-dialog-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+  border-radius: var(--sigil-radius-popover);
+  box-shadow: var(--sigil-shadow-popover);
+  padding: var(--sigil-space-6);
+  width: 90vw;
+  max-width: 540px;
+  max-height: 85vh;
+  overflow-y: auto;
+  z-index: 101;
+}
+
+.sigil-dialog-title {
+  font-size: var(--sigil-font-size-lg);
+  font-weight: 700;
+  color: var(--sigil-color-ink);
+  margin-bottom: var(--sigil-space-2);
+}
+
+.sigil-dialog-description {
+  font-size: var(--sigil-font-size-base);
+  color: var(--sigil-color-slate);
+  margin-bottom: var(--sigil-space-4);
+}
+
+.sigil-popover-content {
+  background-color: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+  border-radius: var(--sigil-radius-popover);
+  box-shadow: var(--sigil-shadow-popover);
+  padding: var(--sigil-space-4);
+  max-width: 320px;
+  z-index: 60;
+}
+
+/* --- Tabs --- */
+.sigil-tabs-list {
+  display: flex;
+  gap: var(--sigil-space-4);
+  border-bottom: 1px solid var(--sigil-color-hairline);
+  margin-bottom: var(--sigil-space-4);
+}
+
+.sigil-tabs-trigger {
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-base);
+  color: var(--sigil-color-slate);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--sigil-space-2) var(--sigil-space-1);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.sigil-tabs-trigger[data-state="active"] {
+  color: var(--sigil-color-ink);
+  border-bottom-color: var(--sigil-color-ink);
+  font-weight: 600;
+}
+
+/* --- Toast --- */
+.sigil-toast-viewport {
+  position: fixed;
+  bottom: var(--sigil-space-4);
+  right: var(--sigil-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sigil-space-2);
+  width: 380px;
+  max-width: 100vw;
+  margin: 0;
+  list-style: none;
+  z-index: 200;
+  outline: none;
+}
+
+.sigil-toast {
+  background-color: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+  border-left: 4px solid var(--sigil-color-ink);
+  border-radius: 3px;
+  box-shadow: var(--sigil-shadow-popover);
+  padding: var(--sigil-space-3) var(--sigil-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sigil-space-1);
+}
+
+.sigil-toast--success {
+  border-left-color: var(--sigil-color-verified);
+}
+
+.sigil-toast--alert {
+  border-left-color: var(--sigil-color-alert);
+}
+
+.sigil-toast__title {
+  font-size: var(--sigil-font-size-base);
+  font-weight: 600;
+  color: var(--sigil-color-ink);
+}
+
+.sigil-toast__description {
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-slate);
+}
+
+/* --- Tooltip --- */
+.sigil-tooltip-content {
+  background-color: var(--sigil-color-ink);
+  color: var(--sigil-color-sheet);
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-xs);
+  border-radius: 3px;
+  padding: var(--sigil-space-1) var(--sigil-space-2);
+  z-index: 150;
+}
+
+/* --- EmptyState --- */
+.sigil-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: var(--sigil-color-sheet);
+  border: 1px dashed var(--sigil-color-hairline);
+  padding: var(--sigil-space-8) var(--sigil-space-4);
+}
+
+.sigil-empty-state__title {
+  font-size: var(--sigil-font-size-lg);
+  font-weight: 600;
+  color: var(--sigil-color-ink);
+  margin-bottom: var(--sigil-space-1);
+}
+
+.sigil-empty-state__description {
+  font-size: var(--sigil-font-size-base);
+  color: var(--sigil-color-slate);
+  margin-bottom: var(--sigil-space-4);
+  max-width: 48ch;
+}
+
+/* --- CustodyBubbles --- */
+.sigil-custody-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--sigil-space-2);
+  width: 100%;
+  padding: var(--sigil-space-3) 0;
+  overflow-x: auto;
+}
+
+.sigil-custody-step {
+  display: flex;
+  align-items: center;
+  gap: var(--sigil-space-2);
+}
+
+.sigil-custody-bubble {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sigil-custody-bubble--done {
+  background-color: var(--sigil-color-ink);
+  border: 1.5px solid var(--sigil-color-ink);
+}
+
+.sigil-custody-bubble--current {
+  background-color: var(--sigil-color-sheet);
+  border: 3px solid var(--sigil-color-marigold);
+}
+
+.sigil-custody-bubble--pending {
+  background-color: var(--sigil-color-sheet);
+  border: 1.5px solid var(--sigil-color-hairline);
+}
+
+.sigil-custody-bubble--cancelled {
+  background-color: var(--sigil-color-sheet);
+  border: 3px solid var(--sigil-color-alert);
+}
+
+.sigil-custody-label {
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-slate);
+  white-space: nowrap;
+}
+
+.sigil-custody-label--active {
+  color: var(--sigil-color-ink);
+  font-weight: 600;
+}
+
+.sigil-custody-connector {
+  flex-grow: 1;
+  height: 1px;
+  min-width: 24px;
+  background-color: var(--sigil-color-hairline);
+}
+
+.sigil-custody-connector--done {
+  background-color: var(--sigil-color-ink);
+}
+
+/* Compact inline bubbles for table rows */
+.sigil-custody-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sigil-custody-inline__bubble {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.sigil-custody-inline__bubble--done {
+  background-color: var(--sigil-color-ink);
+}
+
+.sigil-custody-inline__bubble--current {
+  background-color: var(--sigil-color-marigold);
+}
+
+.sigil-custody-inline__bubble--pending {
+  border: 1px solid var(--sigil-color-hairline);
+  background-color: var(--sigil-color-sheet);
+}
+
+/* --- Coupon Panel --- */
+.sigil-coupon {
+  background-color: var(--sigil-color-sheet);
+  border: 1.5px dashed var(--sigil-color-ink);
+  border-radius: var(--sigil-radius-coupon);
+  padding: var(--sigil-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sigil-space-2);
+}
+
+.sigil-coupon__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sigil-coupon__title {
+  font-size: var(--sigil-font-size-md);
+  font-weight: 700;
+  color: var(--sigil-color-ink);
+  margin: 0;
+}
+
+.sigil-coupon__consequence {
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-slate);
+  margin: 0;
+  line-height: var(--sigil-line-height-normal);
+}
+
+.sigil-coupon__reason {
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-alert);
+  margin-top: var(--sigil-space-1);
+}
+
+/* --- Rosette --- */
+.sigil-rosette {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--sigil-color-ink);
+}
+
+/* --- Serial --- */
+.sigil-serial {
+  font-family: var(--sigil-font-mono);
+  font-size: var(--sigil-font-size-base);
+  font-weight: 600;
+  color: var(--sigil-color-ink);
+  letter-spacing: 0.05em;
+}
+
+/* --- HashChip --- */
+.sigil-hash-chip-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sigil-hash-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sigil-space-1);
+  font-family: var(--sigil-font-mono);
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-ink);
+  background-color: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+  border-radius: 3px;
+  padding: 2px 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease;
+  appearance: none;
+  text-align: left;
+}
+
+.sigil-hash-chip__link {
+  color: var(--sigil-color-ink);
+  text-decoration: none;
+}
+
+.sigil-hash-chip:hover {
+  background-color: var(--sigil-color-mist);
+}
+
+.sigil-hash-chip__copy-icon {
+  width: 12px;
+  height: 12px;
+  opacity: 0.6;
+}
+
+/* --- ThresholdMeter --- */
+.sigil-threshold-meter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sigil-space-1);
+}
+
+.sigil-threshold-notches {
+  display: flex;
+  align-items: center;
+  gap: var(--sigil-space-1);
+}
+
+.sigil-threshold-notch {
+  width: 16px;
+  height: 16px;
+  border-radius: 0px; /* SQUARE notch */
+  flex-shrink: 0;
+}
+
+.sigil-threshold-notch--filled {
+  background-color: var(--sigil-color-ink);
+  border: 1.5px solid var(--sigil-color-ink);
+}
+
+.sigil-threshold-notch--empty {
+  background-color: var(--sigil-color-sheet);
+  border: 1.5px solid var(--sigil-color-hairline);
+}
+
+.sigil-threshold-label {
+  font-family: var(--sigil-font-mono);
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-slate);
+}
+
+/* --- CountdownLock --- */
+.sigil-countdown-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sigil-space-2);
+}
+
+.sigil-countdown-lock__square {
+  width: 14px;
+  height: 14px;
+  background-color: var(--sigil-color-marigold);
+  border-radius: 0px;
+  flex-shrink: 0;
+}
+
+.sigil-countdown-lock__time {
+  font-family: var(--sigil-font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--sigil-color-ink);
+  letter-spacing: 0.05em;
+}
+
+.sigil-countdown-lock__label {
+  font-size: var(--sigil-font-size-xs);
+  color: var(--sigil-color-slate);
+}
+
+/* --- LedgerTable --- */
+.sigil-ledger-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--sigil-color-hairline);
+  background-color: var(--sigil-color-sheet);
+  border-radius: var(--sigil-radius-table);
+}
+
+.sigil-ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  border-radius: 0;
+}
+
+.sigil-ledger-table th {
+  padding: var(--sigil-space-2) var(--sigil-space-3);
+  font-family: var(--sigil-font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sigil-color-slate);
+  text-transform: none;
+  border-bottom: 1px solid var(--sigil-color-hairline);
+  background-color: var(--sigil-color-mist);
+}
+
+.sigil-ledger-table td {
+  padding: var(--sigil-space-2) var(--sigil-space-3);
+  font-size: var(--sigil-font-size-base);
+  color: var(--sigil-color-ink);
+  border-bottom: 1px solid var(--sigil-color-hairline);
+}
+
+.sigil-ledger-table tr:last-child td {
+  border-bottom: none;
+}
+
+.sigil-ledger-table tbody tr:hover {
+  background-color: rgba(231, 237, 234, 0.4);
+}
+
+.sigil-ledger-table tbody tr:focus-visible {
+  outline: var(--sigil-focus-outline);
+  outline-offset: -1px;
+}
+
+/* --- StateStamp --- */
+.sigil-state-stamp {
+  display: inline-block;
+  padding: 3px 10px;
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-xs);
+  font-weight: 700;
+  text-transform: capitalize;
+  border: 2px solid;
+  border-radius: var(--sigil-radius-stamp);
+  transform: rotate(-4deg);
+  letter-spacing: 0.04em;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.sigil-state-stamp--draft {
+  border-color: var(--sigil-color-slate);
+  color: var(--sigil-color-slate);
+}
+
+.sigil-state-stamp--collecting {
+  border-color: var(--sigil-color-pending);
+  color: var(--sigil-color-pending);
+}
+
+.sigil-state-stamp--sealed {
+  border-color: var(--sigil-color-ink);
+  color: var(--sigil-color-ink);
+}
+
+.sigil-state-stamp--released {
+  border-color: var(--sigil-color-verified);
+  color: var(--sigil-color-verified);
+  animation: seal-break 0.4s ease-out;
+}
+
+.sigil-state-stamp--concluded {
+  border-color: var(--sigil-color-ink);
+  color: var(--sigil-color-ink);
+}
+
+.sigil-state-stamp--cancelled {
+  border-color: var(--sigil-color-alert);
+  color: var(--sigil-color-alert);
+}
+
+@keyframes seal-break {
+  0% { transform: scale(1.15) rotate(0deg); opacity: 0.7; }
+  50% { transform: scale(0.95) rotate(-6deg); }
+  100% { transform: scale(1) rotate(-4deg); opacity: 1; }
+}
+
+/* --- TxDrawer --- */
+.sigil-tx-drawer {
+  background-color: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+  border-radius: 3px;
+  padding: var(--sigil-space-4);
+  box-shadow: var(--sigil-shadow-popover);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sigil-space-2);
+}
+
+.sigil-tx-drawer__status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sigil-space-1);
+  font-size: var(--sigil-font-size-xs);
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 2px;
+  width: fit-content;
+}
+
+.sigil-tx-drawer__status-badge--preparing {
+  background-color: var(--sigil-color-mist);
+  color: var(--sigil-color-slate);
+}
+
+.sigil-tx-drawer__status-badge--awaiting-signature {
+  background-color: rgba(229, 154, 14, 0.15);
+  color: #a86c00;
+}
+
+.sigil-tx-drawer__status-badge--pending {
+  background-color: rgba(44, 93, 143, 0.15);
+  color: var(--sigil-color-pending);
+}
+
+.sigil-tx-drawer__status-badge--confirmed {
+  background-color: rgba(29, 122, 87, 0.15);
+  color: var(--sigil-color-verified);
+}
+
+.sigil-tx-drawer__status-badge--failed {
+  background-color: rgba(176, 58, 46, 0.15);
+  color: var(--sigil-color-alert);
+}

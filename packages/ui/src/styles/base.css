@@ -1,0 +1,85 @@
+/* Base Reset and Global Styles for SIGIL */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--sigil-font-sans);
+  font-size: var(--sigil-font-size-base);
+  line-height: var(--sigil-line-height-normal);
+  color: var(--sigil-color-ink);
+  background-color: var(--sigil-color-mist);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: var(--sigil-color-ink);
+  background-color: var(--sigil-color-mist);
+}
+
+/* Headings: weight and size, not color or italics */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: var(--sigil-space-2);
+  color: var(--sigil-color-ink);
+  font-weight: 700;
+  line-height: var(--sigil-line-height-tight);
+}
+
+h1 { font-size: var(--sigil-font-size-2xl); }
+h2 { font-size: var(--sigil-font-size-xl); }
+h3 { font-size: var(--sigil-font-size-lg); }
+h4 { font-size: var(--sigil-font-size-md); }
+h5 { font-size: var(--sigil-font-size-base); }
+h6 { font-size: var(--sigil-font-size-xs); }
+
+/* Paragraphs & body line length under 75 characters */
+p {
+  margin-top: 0;
+  margin-bottom: var(--sigil-space-2);
+  max-width: 75ch;
+}
+
+/* Monospace numerals, addresses, hashes, serials */
+.sigil-mono,
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--sigil-font-mono);
+  font-feature-settings: "tnum" 1;
+}
+
+/* Links */
+a {
+  color: var(--sigil-color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--sigil-color-slate);
+}
+
+/* Focus ring: Marigold focus ring for keyboard navigation */
+:focus-visible {
+  outline: var(--sigil-focus-outline) !important;
+  outline-offset: var(--sigil-focus-offset) !important;
+}
+
+/* Prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

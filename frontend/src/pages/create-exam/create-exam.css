@@ -1,0 +1,227 @@
+.create-exam,
+.create-exam__state {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.create-exam__header {
+  border-bottom: 1px solid var(--sigil-color-hairline);
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+}
+
+.create-exam__layout {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 32px;
+}
+
+.create-exam__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.create-exam__step {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  align-items: start;
+  gap: 8px;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--sigil-color-slate);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.create-exam__step-bubble {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  border: 1.5px solid var(--sigil-color-hairline);
+  border-radius: 50%;
+}
+
+.create-exam__step.is-current {
+  color: var(--sigil-color-ink);
+  font-weight: 700;
+}
+
+.create-exam__step.is-current .create-exam__step-bubble {
+  border: 3px solid var(--sigil-color-marigold);
+}
+
+.create-exam__step.is-done .create-exam__step-bubble {
+  border-color: var(--sigil-color-ink);
+  background: var(--sigil-color-ink);
+}
+
+.create-exam__form {
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--sigil-color-hairline);
+  background: var(--sigil-color-sheet);
+}
+
+.create-exam__form h2 {
+  margin-bottom: 16px;
+}
+
+.create-exam__row,
+.create-exam__participant-row,
+.create-exam__actions,
+.create-exam__footer {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.create-exam__row,
+.create-exam__participant-row {
+  margin: 16px 0;
+}
+
+.create-exam__row > .sigil-field,
+.create-exam__participant-row > .sigil-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.create-exam__address-list {
+  margin: 20px 0;
+}
+
+.create-exam__address-list h3 {
+  margin-bottom: 8px;
+}
+
+.create-exam__key-ok,
+.create-exam__key-missing {
+  flex: 0 0 170px;
+  padding-bottom: 12px;
+  font-size: 13px;
+}
+
+.create-exam__key-ok {
+  color: var(--sigil-color-verified);
+}
+
+.create-exam__key-missing,
+.create-exam__error {
+  color: var(--sigil-color-alert);
+}
+
+.create-exam__error {
+  margin: 4px 0 12px;
+  font-size: 13px;
+}
+
+.create-exam__hint {
+  color: var(--sigil-color-slate);
+  font-size: 13px;
+}
+
+.create-exam__review {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.4fr) minmax(0, 1fr);
+  gap: 8px 16px;
+}
+
+.create-exam__review dt {
+  color: var(--sigil-color-slate);
+}
+
+.create-exam__review dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.create-exam__error-summary {
+  margin: 20px 0;
+  padding: 16px;
+  border-left: 4px solid var(--sigil-color-alert);
+  background: var(--sigil-color-mist);
+}
+
+.create-exam__footer {
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--sigil-color-hairline);
+}
+
+.create-exam__state {
+  min-height: 240px;
+  background: var(--sigil-color-sheet);
+  border: 1px solid var(--sigil-color-hairline);
+}
+
+.create-exam__state--loading {
+  display: flex;
+  flex-direction: column;
+  min-height: 524px;
+}
+
+.create-exam__skeleton {
+  background: var(--sigil-color-hairline);
+  animation: create-exam-pulse 1.4s ease-in-out infinite;
+}
+
+.create-exam__skeleton--heading {
+  width: 280px;
+  max-width: 100%;
+  height: 32px;
+  margin-bottom: 28px;
+}
+
+.create-exam__skeleton--form {
+  flex: 1;
+  height: 220px;
+}
+
+@keyframes create-exam-pulse {
+  50% { opacity: 0.45; }
+}
+
+@media (max-width: 760px) {
+  .create-exam__state--loading {
+    min-height: 1308px;
+  }
+
+  .create-exam__layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .create-exam__review {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .create-exam__steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .create-exam__row,
+  .create-exam__participant-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .create-exam__key-ok,
+  .create-exam__key-missing {
+    flex-basis: auto;
+    padding-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .create-exam__skeleton {
+    animation: none;
+  }
+}

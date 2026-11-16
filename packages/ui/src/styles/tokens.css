@@ -1,0 +1,55 @@
+:root {
+  /* Colors */
+  --sigil-color-mist: #E7EDEA;
+  --sigil-color-sheet: #F9FBFA;
+  --sigil-color-ink: #0F2740;
+  --sigil-color-slate: #566A7B;
+  --sigil-color-hairline: #C3D0CB;
+  --sigil-color-marigold: #E59A0E;
+  --sigil-color-verified: #176B4B;
+  --sigil-color-alert: #B03A2E;
+  --sigil-color-pending: #2C5D8F;
+
+  /* Fonts */
+  --sigil-font-sans: 'Atkinson Hyperlegible Next', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --sigil-font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Typography scale */
+  --sigil-font-size-xs: 13px;
+  --sigil-font-size-base: 15px;
+  --sigil-font-size-md: 17px;
+  --sigil-font-size-lg: 22px;
+  --sigil-font-size-xl: 28px;
+  --sigil-font-size-2xl: 40px;
+
+  /* Line heights */
+  --sigil-line-height-tight: 1.25;
+  --sigil-line-height-normal: 1.5;
+  --sigil-line-height-relaxed: 1.65;
+
+  /* Spacing: 8px base grid */
+  --sigil-space-1: 4px;
+  --sigil-space-2: 8px;
+  --sigil-space-3: 12px;
+  --sigil-space-4: 16px;
+  --sigil-space-5: 20px;
+  --sigil-space-6: 24px;
+  --sigil-space-8: 32px;
+  --sigil-space-10: 40px;
+  --sigil-space-12: 48px;
+
+  /* Radii */
+  --sigil-radius-input: 3px;
+  --sigil-radius-button: 3px;
+  --sigil-radius-table: 0px;
+  --sigil-radius-coupon: 0px;
+  --sigil-radius-popover: 3px;
+  --sigil-radius-stamp: 2px;
+
+  /* One shadow only (popovers and dialogs) */
+  --sigil-shadow-popover: 0 4px 16px rgba(15, 39, 64, 0.12);
+
+  /* Marigold focus ring */
+  --sigil-focus-outline: 2px solid var(--sigil-color-marigold);
+  --sigil-focus-offset: 2px;
+}

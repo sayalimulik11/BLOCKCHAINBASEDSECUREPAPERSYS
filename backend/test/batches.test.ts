@@ -272,4 +272,37 @@ describe("Batch blob endpoints (BE-05)", () => {
     );
     expect(denied.status).toBe(403);
   });
+
+  it("rejects path traversal with forward-slash, backslash, and absolute paths, and returns 404 for missing files", async () => {
+    const agent = await createAgent(setter);
+    const upload = await agent
+      .post("/api/exams/1/batches")
+      .field("sectionId", "0")
+      .field("questionCount", "1")
+      .attach("file", Buffer.from("batch ciphertext"), {
+        filename: "batch.bin",
+        contentType: "application/octet-stream",
+      });
+    const batch = mockBatches.get(upload.body.id);
+    batch.status = "confirmed";
+
+    const authorityAgent = await createAgent(authority);
+    const badPaths = ["../x", "..\\x", "/outside.bin", path.resolve(blobDir, "outside.bin")];
+    for (const badPath of badPaths) {
+      batch.blobPath = badPath;
+      const res = await authorityAgent.get(
+        `/api/exams/1/batches/${batch.id}/download`
+      );
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe("INVALID_STORAGE_PATH");
+    }
+
+    const freshAuthorityAgent = await createAgent(authority);
+    batch.blobPath = "genuinely-missing.bin";
+    const missing = await freshAuthorityAgent.get(
+      `/api/exams/1/batches/${batch.id}/download`
+    );
+    expect(missing.status).toBe(404);
+    expect(missing.body.error.code).toBe("BLOB_NOT_FOUND");
+  });
 });

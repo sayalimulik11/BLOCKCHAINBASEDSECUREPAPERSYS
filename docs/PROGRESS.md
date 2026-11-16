@@ -51,3 +51,25 @@
 | BE-13 | Member 3 | Completed | [PR #1](https://github.com/GargiLaulkar/BLOCKCHAINBASEDSECUREPAPERSYS/pull/1) | Reset and `dev:all` runtime checks passed; all DB tables and `BLOB_DIR` remained empty. Approved by Member 2 peer review. |
 
 Current verification (2026-10-18 / 2026-10-19): migration deploy and reset passed; all seven PostgreSQL application tables and `BLOB_DIR` were empty after reset/startup; `dev:all` used `DATABASE_URL` and started chain/API/web; `/api/health` returned HTTP 200. Root lint and backend typecheck passed; backend suite 52 passed/296 skipped; indexer process 1 passed; authorization matrix 295 passed; @sigil/core 17 passed; @sigil/contracts 149 passed with 100% statement / 96.36% branch coverage; zero OpenAPI and contract spec drift. **All BE-01..BE-13 Completed and approved by Member 2.** Review package: [member3-review-request.md](./reviews/member3-review-request.md). Branch: `m3/BE-wrapup-verification`. PR #1: https://github.com/GargiLaulkar/BLOCKCHAINBASEDSECUREPAPERSYS/pull/1. Remote PR head `f2c67fd5a94478816bd39536bddc444e9e748aca` (20 commits). Remaining: Gate 2 walking-skeleton check after frontend delivery, and final integration review (section 15 review ring). See [HANDOFF.md](./HANDOFF.md).
+
+## Frontend A & Design System Progress (Member 4)
+
+| Task ID | Description | Status | Notes |
+|---|---|---|---|
+| FA-01 | Tokens, offline fonts, base CSS, marigold focus ring, prefers-reduced-motion rules, 8px spacing, WCAG AA contrast check | Completed | Verified tokens in `@sigil/ui`, Atkinson fonts offline, contrast table in `/dev/gallery` |
+| FA-02 | Primitive components: Button, Field, FieldError, Select, Dialog, Popover, Tabs, Toast, Tooltip, EmptyState | Completed | Radix UI primitives re-themed for security paper language, keyboard & screen-reader checked |
+| FA-03 | Signature components: CustodyBubbles, Coupon, Rosette (`rosettePath`), Serial, HashChip, ThresholdMeter, CountdownLock, LedgerTable, TxDrawer, StateStamp | Completed | Vitest determinism & snapshot tests pass (5/5); all components rendered in `/dev/gallery` |
+| FA-04 | App shell: top bar, SIWE authentication, MetaMask integration, useAuthGuard, four guard screens, TxDrawer wiring | Completed | Top bar layout matches UI reference, 4 guard screens tested, role-aware nav tested, zero storage of keys |
+| FA-08 | Contract error decoder to plain-language messages without apologies | Completed | Covers all section 7.4 & ExamVault.sol custom errors, table-driven unit tests pass (34/34 in frontend) |
+| FA-05 | Admin participants and Authority docket | Completed | Live-data pages use the merged FB-01 hooks; targeted and full frontend checks passed |
+| FA-06 | Create Exam wizard and Key Ceremony | Implemented; owner follow-up required | Wizard, ceremony workflow, and sample-only gallery states implemented with generated API types, chain reads, and TxDrawer transactions. Private-key zeroization remains unverified by the current core implementation; see HANDOFF. |
+| FA-07 | Exam command centre | Implemented; owner follow-up required | Chain-backed lifecycle, quotas, readiness, coupons, and sample-only gallery states implemented. Share verification is not tracked by the current readiness API; contract/spec quota semantics need an ICR. See HANDOFF. |
+| FA-09 | Setter flow | Completed | Setter assignments, validated question composer/import, encrypted batch submission, retry lifecycle, and component/workflow tests. Final desktop/mobile headless Chrome verification passed; the optional section-totals hook request is recorded in HANDOFF. |
+| FA-10 | Key holder flow | Implemented; owner follow-up required | Keystore setup, encrypted-share verification, randomness commitment, and release console pass tests and final desktop/mobile gallery verification. The optional holder-status hook and best-effort memory cleanup are recorded in HANDOFF. `submitShare` is the protocol-defined release-time publication of the share, not an item awaiting owner confirmation. |
+| FA-11 | Accessibility and visual quality review | Implemented; library note remains | Final gallery verification captured 168 desktop/mobile screenshots at 1280px and 390px. Captured-state axe, contrast, responsive, reduced-motion, keyboard, storage, and layout-height checks passed; the open Radix Select background `aria-hidden-focus` behavior is documented in HANDOFF. Production CSP build and preview passed. Full audit: `docs/AUDIT_MEMBER4.md`. Updated per PROMPT5 final pass. |
+
+## Frontend B (Member 5) – FB-01 Data Hooks
+
+| Task ID | Description | Status | Notes |
+|---|---|---|---|
+| FB-01 | Data-layer hooks for participants, exam summaries, and exam panel state | Implemented | Hook layer added under `frontend/src/hooks/` and exported via `index.ts`; final pass fixed mined tx confirmation, refresh invalidation, and pnpm workspace consistency |

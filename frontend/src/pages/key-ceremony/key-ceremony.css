@@ -1,0 +1,156 @@
+.key-ceremony,
+.key-ceremony__state {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.key-ceremony__header {
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--sigil-color-hairline);
+}
+
+.key-ceremony__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.key-ceremony__steps {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.key-ceremony__step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px 12px;
+  padding: 8px 0 20px;
+  color: var(--sigil-color-slate);
+}
+
+.key-ceremony__step:not(:last-child)::after {
+  position: absolute;
+  top: 26px;
+  bottom: -2px;
+  left: 10px;
+  width: 1px;
+  content: '';
+  background: var(--sigil-color-hairline);
+}
+
+.key-ceremony__bubble {
+  z-index: 1;
+  grid-row: span 2;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--sigil-color-hairline);
+  border-radius: 50%;
+  background: var(--sigil-color-mist);
+}
+
+.key-ceremony__step.is-active {
+  color: var(--sigil-color-ink);
+  font-weight: 700;
+}
+
+.key-ceremony__step.is-active .key-ceremony__bubble {
+  border: 3px solid var(--sigil-color-marigold);
+}
+
+.key-ceremony__step.is-complete .key-ceremony__bubble {
+  border-color: var(--sigil-color-ink);
+  background: var(--sigil-color-ink);
+}
+
+.key-ceremony__step.is-error .key-ceremony__bubble {
+  border-color: var(--sigil-color-alert);
+}
+
+.key-ceremony__step-status {
+  grid-column: 2;
+  color: var(--sigil-color-slate);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.key-ceremony__action {
+  padding: 20px;
+  border: 1px solid var(--sigil-color-hairline);
+  background: var(--sigil-color-sheet);
+}
+
+.key-ceremony__holders {
+  padding: 0;
+  list-style: none;
+}
+
+.key-ceremony__holders li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--sigil-color-hairline);
+  font-size: 13px;
+}
+
+.key-ceremony__holders li span:first-child {
+  overflow-wrap: anywhere;
+}
+
+.key-ceremony__failure,
+.key-ceremony__complete {
+  margin: 16px 0;
+  padding: 12px;
+  border-left: 4px solid var(--sigil-color-alert);
+  background: var(--sigil-color-mist);
+}
+
+.key-ceremony__complete {
+  border-left-color: var(--sigil-color-verified);
+}
+
+.key-ceremony__state {
+  min-height: 200px;
+  border: 1px solid var(--sigil-color-hairline);
+  background: var(--sigil-color-sheet);
+}
+
+.key-ceremony__skeleton {
+  height: 200px;
+  background: var(--sigil-color-hairline);
+}
+
+.key-ceremony__state--loading {
+  display: flex;
+  flex-direction: column;
+  min-height: 675px;
+}
+
+.key-ceremony__state--loading .key-ceremony__skeleton {
+  flex: 1;
+}
+
+@media (max-width: 760px) {
+  .key-ceremony__state--loading {
+    min-height: 1468px;
+  }
+
+  .key-ceremony__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .key-ceremony__holders li {
+    align-items: start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
