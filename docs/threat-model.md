@@ -45,11 +45,11 @@ This document expands every threat, security control, and residual risk analyzed
 ### 2. Setting: Authority reads the paper early
 
 - **Threat:** An Exam Authority official or insider attempts to inspect or decrypt question batches before the scheduled release window.
-- **Control:** The exam private key scalar is generated during the key ceremony, split into $n$ Shamir secret shares with threshold $t$, individually encrypted to the registered P-256 public keys of assigned holders, and immediately scrubbed from memory. The smart contract strictly enforces that no share submissions are accepted before `releaseOpensAt`.
-- **Residual Risk:** The Exam Authority's browser environment is trusted during the client-side key generation ceremony to discard the raw private key and plain shares from volatile memory.
+- **Control:** The exam private key scalar is generated during the key ceremony, split into $n$ Shamir secret shares with threshold $t$, and individually encrypted to the registered P-256 public keys of assigned holders. The ceremony overwrites its mutable scalar/share buffers on success and failure and drops references to the exported JWK and conversion strings. The smart contract strictly enforces that no share submissions are accepted before `releaseOpensAt`.
+- **Residual Risk:** Cleanup is best-effort only. JavaScript strings, WebCrypto and runtime/library copies cannot be physically zeroized or verified, so the Exam Authority's browser remains trusted during client-side key generation.
 - **Evidence:**
   - `contracts/test/ExamVault.test.ts` > `Threshold Release & Submit Share (SC-06)` > `Time boundary validations (1 second before and after each boundary)` > `should revert TooEarly exactly 1 second before releaseOpensAt`
-  - Ephemeral key ceremony & memory scrubbing: `Pending: Member 2, CR-06`
+  - Ephemeral key ceremony buffer cleanup: `packages/core/test/ceremony.test.ts` (`runCeremony secret cleanup`)
   - Shamir secret splitting: `Pending: Member 2, CR-04`
 
 ---

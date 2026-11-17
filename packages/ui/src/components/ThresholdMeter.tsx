@@ -1,9 +1,9 @@
 import React from 'react';
 
 export interface ThresholdMeterProps {
-  current: number;
-  threshold: number;
-  total: number;
+  current?: number;
+  threshold?: number;
+  total?: number;
   className?: string;
   label?: string;
 }
@@ -15,20 +15,38 @@ export const ThresholdMeter: React.FC<ThresholdMeterProps> = ({
   className = '',
   label,
 }) => {
-  const notches = Array.from({ length: total }, (_, i) => i);
+  const hasValidValues =
+    typeof current === 'number' &&
+    Number.isSafeInteger(current) &&
+    current >= 0 &&
+    typeof threshold === 'number' &&
+    Number.isSafeInteger(threshold) &&
+    threshold > 0 &&
+    typeof total === 'number' &&
+    Number.isSafeInteger(total) &&
+    total > 0 &&
+    current <= total &&
+    threshold <= total;
+  const notches = hasValidValues
+    ? Array.from({ length: total }, (_, i) => i)
+    : [];
+  const accessibleLabel = hasValidValues
+    ? label || `Threshold status: ${current} of ${total} shares (threshold ${threshold})`
+    : label || 'Threshold status unavailable';
 
   return (
     <div
       className={`sigil-threshold-meter ${className}`.trim()}
       role="progressbar"
-      aria-label={label || `Threshold status: ${current} of ${total} shares (threshold ${threshold})`}
-      aria-valuenow={current}
+      aria-label={accessibleLabel}
+      aria-valuetext={hasValidValues ? undefined : 'Threshold status unavailable'}
+      aria-valuenow={hasValidValues ? current : undefined}
       aria-valuemin={0}
-      aria-valuemax={total}
+      aria-valuemax={hasValidValues ? total : undefined}
     >
       <div className="sigil-threshold-notches">
         {notches.map((idx) => {
-          const isFilled = idx < current;
+          const isFilled = idx < (current ?? 0);
           return (
             <div
               key={idx}
@@ -42,7 +60,9 @@ export const ThresholdMeter: React.FC<ThresholdMeterProps> = ({
         })}
       </div>
       <div className="sigil-threshold-label">
-        {current} / {threshold} required ({total} total holders)
+        {hasValidValues
+          ? `${current} / ${threshold} required (${total} total holders)`
+          : 'Threshold status unavailable'}
       </div>
     </div>
   );

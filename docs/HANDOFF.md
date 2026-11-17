@@ -1,19 +1,23 @@
 # Open items
 
-## Owner follow-ups
+## Owner decisions
 
-- **Member 2 — ceremony secret cleanup:** `packages/core/src/ceremony.ts` exports private JWK scalar `d` and Shamir share buffers that are not explicitly zeroed on every success and failure path. The frontend does not receive the exam private key and cannot clear those core-local buffers. Add zeroization in `runCeremony` and tests for success and failure; until then the frontend can only state that the key was not returned to or stored by the screen, not that core memory was physically wiped.
-- **Member 2 / contract owner — frozen ABI discrepancy:** the section 7 prose describes `openCollection(examId, commitments)` and a two-argument `commitRandomness(examId, commitment)`. The checked-in ABI exposes `openCollection(uint256,bytes)` and `commitRandomness(uint256,bytes32,bytes32)`. The UI follows the generated ABI; reconcile the frozen interface and intended flow through an ICR.
-- **Member 1 / contract owner — seal quota discrepancy:** the spec says each section must have at least its quota, while `ExamVault.sealExam` currently requires exact equality (`have == need`). The UI follows the contract and reports both under- and over-quota blockers. Reconcile the contract and spec through an ICR.
-- **Member 5 — optional command-centre hook:** expose `useExamCommandCentre(examId: string | null, options?: { enabled?: boolean })` returning `{ exam: { state: number; metaHash: string; bankHash: string | null; releaseOpensAt: string; examStartsAt: string; examEndsAt: string; threshold: number } | null; chainTime: number | null; sectionQuestionCounts: readonly { sectionId: number; questionCount: number }[]; holders: readonly { address: string; keyRegistered: boolean; shareVerified: boolean | "not-tracked"; randomnessCommitted: boolean }[]; setters: readonly { address: string; batchesSubmitted: boolean; batchCount: number }[]; isLoading: boolean; error: Error | null; refetch: () => Promise<void> }`. `CommandCentreContainer` currently reads the missing chain-only values directly.
-- **Member 5 — optional setter section totals hook:** expose `useExamSectionTotals(examId: string | null, options?: { enabled?: boolean; contract?: ethers.Contract | null }): { totals: readonly bigint[]; isLoading: boolean; error: Error | null; refetch: () => Promise<readonly bigint[]> }`. Setter containers currently read `getSectionTotals` from the checked-in ABI.
-- **Member 5 — optional holder status hook:** expose `useHolderExamStatus(examId: string | null, holder: Address | null, options?: { enabled?: boolean; contract?: ethers.Contract | null }): { encryptionKey: Uint8Array | null; shareCommitment: Hex | null; randomnessCommitted: boolean; shareSubmitted: boolean; submissionCount: number; chainTime: number | null; isLoading: boolean; error: Error | null; refetch: () => Promise<void> }`. `HolderConsoleContainer` currently performs these on-chain reads directly.
+- **Member 2 — ceremony secret cleanup (resolved locally 2026-11-16):** `runCeremony` now clears the mutable scalar and Shamir share buffers in a `finally` block and drops references to exported JWK and conversion strings. Success and encryption-failure paths are tested. JavaScript strings and WebCrypto/runtime copies still prevent any guarantee of physical memory zeroization.
+- **Member 2 / contract owner — frozen ABI discrepancy:** section 7 documents `openCollection(examId, examPublicKey, shareCommitments)` and `commitRandomness(examId, commitment)`. The checked-in contract and ABI instead expose `openCollection(uint256,bytes)` and `commitRandomness(uint256,bytes32,bytes32)`; each holder submits both its share and randomness commitments. The frontend/backend follow the checked-in ABI. Options: (1) confirm current behavior and amend the spec, which requires no contract migration and preserves existing clients; or (2) implement the spec flow in a new deployment, update every ABI/client/indexer, and migrate/recreate exams because the contract is not upgradeable. **Recommendation:** keep the frozen interface until the owner decides; if the current flow is intended, reconcile the spec by ICR.
+- **Member 1 / contract owner — seal quota discrepancy:** the spec requires each section to have at least its quota; `ExamVault.sealExam` rejects any total not exactly equal to the quota. Options: (1) confirm exact quotas and amend the spec, preserving the deployed interface; or (2) change the contract to permit excess questions and deploy a new version, then update clients and reconcile selection/bank semantics for existing exams. **Recommendation:** do not change contract rules without approval; the owner should decide whether the intended workflow selects from an oversized question pool.
+- **Readiness `shareVerified` — protocol/owner decision if server verification is required:** this is established when the holder decrypts a share locally and compares it with its commitment. The server receives no trustworthy proof of that local operation. Keep it explicitly untracked; do not infer it from a self-report or randomness commitment. A server-verifiable status would require a separately designed proof/protocol and security review.
+
+## Optional hooks (not blockers)
+
+- `useExamCommandCentre(examId, options)` could centralize the values currently read by `CommandCentreContainer`; its current direct contract reads plus indexed API readiness work and were exercised in the local lifecycle check.
+- `useExamSectionTotals(examId, options)` could centralize `getSectionTotals`; the checked-in ABI and current direct reads already provide the required counts.
+- `useHolderExamStatus(examId, holder, options)` could centralize holder chain state; the current container reads those values directly and keeps decryption verification local.
 
 ## Privacy and memory guarantees
 
 Section 5 phase 5 intentionally publishes a holder's plaintext share on-chain through the `submitShare` transaction at release time. This single transaction at release time is the only place a share leaves the browser; it is a protocol action by design (section 5 phase 5), not an item awaiting owner confirmation. The share, passphrase, private key, and reveal are not sent to the metadata/share API or browser storage.
 
-Frontend cleanup is best-effort JavaScript cleanup: component references and passphrase fields are cleared, byte buffers are overwritten where available, and JWK scalar strings are replaced. JavaScript engines and `@sigil/core` may retain copies or internal buffers; physical zeroization cannot be guaranteed until the core ceremony path is corrected and the browser runtime provides stronger guarantees.
+Frontend and core cleanup is best-effort JavaScript cleanup: component references and passphrase fields are cleared, mutable scalar/share buffers are overwritten on both success and failure, and JWK/conversion-string references are dropped. JavaScript engines, immutable strings, WebCrypto and internal libraries may retain copies; physical zeroization cannot be guaranteed.
 
 ## Deployment and final manual check
 
@@ -25,15 +29,16 @@ default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style
 
 Set `SIGIL_CSP_CONNECT_SRC` in the production build environment to `'self'` followed by the API and RPC HTTP(S) origins, for example `'self' https://api.example https://rpc.example`. The Vite build rejects other source forms. `style-src 'unsafe-inline'` remains necessary for current inline React style attributes; scripts do not allow `unsafe-eval`. Offline fonts are served from the application origin.
 
-Before release, run the real-stack walkthrough yourself with a configured `backend/.env`, database, local chain, and real MetaMask accounts for each role. The chain/backend/database were not started for the Member 4 final verification.
+The local application stack was started with the configured backend environment, PostgreSQL, a Hardhat chain (31337), the backend API, and Vite frontend. The configured database migration was already up to date. A disposable exam was created, its encrypted ceremony shares were retrieved/decrypted by holder test accounts, a question batch was uploaded and submitted, section totals and indexed readiness/history were checked, the exam was sealed, and threshold shares released it. The API exposed the confirmed release and a hash-verified batch download; the downloaded batch decrypted to the submitted question. The test exam, share records, batch/blob, and local bootstrap participants/events were removed afterward.
 
-## Accessibility library note
+This was a local Hardhat JSON-RPC signer walkthrough, **not** a MetaMask walkthrough. `window.ethereum` was unavailable in the integrated browser, so MetaMask installation/connection, network switching, and wallet-popup confirmation for each real role remain manual release checks. No production wallet, network, contract, or database was used.
 
-When Radix Select is open, its current modal implementation applies `aria-hidden` to the rest of the gallery while leaving background controls focusable in the DOM. A full-document axe scan in that transient state reports `aria-hidden-focus` on the hidden siblings. The select overlay itself passes axe, and the full-document scans for the captured page screenshots pass. The current Radix Select Root API exposes no `modal` option, so this library-owned behavior is recorded for an upstream UI-library review rather than worked around with global DOM mutation.
+## Select accessibility finding: resolved
+
+The existing Select API is preserved, but its implementation now uses a non-modal Radix Popover with listbox semantics. This avoids hiding focusable page content when the menu is open without global DOM mutation. The focused accessibility test covers accessible naming, selected option semantics, keyboard selection, Escape, Tab exit, and focus retention/restoration; full-document axe and browser checks passed.
 
 ## Open items for other members
-- Member 5: useParticipants must read positional array payload [address, role, profileHash] (accept object too); request <=100 events per call.
-- Member 3: start indexer in backend/src/server.ts; document payloadJson shape in OpenAPI.
-- runCeremony: zero buffers; ceremony screen must not claim key wiped.
-- Contract differs from spec for openCollection, commitRandomness; sealExam needs exact quota.
-- Optional hooks: useExamCommandCentre, useExamSectionTotals, useHolderExamStatus.
+- Member 5 participants feed: resolved in current tree; the API normalizes positional legacy payloads to named ABI fields, and the hook requests cursor-paginated pages of at most 100 events.
+- Member 3 indexer startup: resolved locally 2026-11-16; the backend server now starts the indexer and stops it during graceful shutdown.
+- Owner decisions remain for the `openCollection`/`commitRandomness` specification mismatch and exact-versus-at-least quota rule.
+- The three hooks above remain optional follow-up improvements, not correctness blockers.

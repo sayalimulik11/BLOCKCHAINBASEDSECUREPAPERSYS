@@ -1,30 +1,57 @@
 import { ethers } from "ethers";
-import type { Provider } from "ethers";
+import type { ParamType, Provider } from "ethers";
 import { ExamVaultABI } from "@sigil/contracts-types";
 import { logger } from "../logger.js";
 import { IndexerStateManager } from "./state.js";
 import { handleEvent } from "./handlers.js";
 import type { Config } from "../config.js";
 
-function serializeArgs(args: any): any {
-  if (typeof args === "bigint") return args.toString();
-  if (args === null || args === undefined) return args;
-  if (Array.isArray(args)) {
-    if (typeof args.toObject === "function") {
-      return serializeArgs(args.toObject());
+function serializeValue(value: any, paramType?: ParamType): any {
+  if (typeof value === "bigint") return value.toString();
+  if (value === null || value === undefined) return value;
+
+  if (Array.isArray(value)) {
+    if (paramType?.baseType === "array" && paramType.arrayChildren) {
+      return value.map((item) => serializeValue(item, paramType.arrayChildren!));
     }
-    return args.map(serializeArgs);
-  }
-  if (typeof args === "object") {
-    const out: Record<string, any> = {};
-    for (const [k, v] of Object.entries(args)) {
-      if (!/^\d+$/.test(k)) {
-        out[k] = serializeArgs(v);
+
+    if (paramType?.baseType === "tuple" && paramType.components) {
+      const components = paramType.components;
+      if (components.every((component) => component.name)) {
+        return Object.fromEntries(
+          components.map((component, index) => [
+            component.name,
+            serializeValue(value[index], component),
+          ])
+        );
       }
+      return components.map((component, index) =>
+        serializeValue(value[index], component)
+      );
     }
-    return out;
+
+    return value.map((item) => serializeValue(item));
   }
-  return args;
+
+  if (typeof value === "object") {
+    const entries = Object.entries(value).filter(
+      ([key]) => !/^\d+$/.test(key)
+    );
+    return Object.fromEntries(
+      entries.map(([key, item]) => [key, serializeValue(item)])
+    );
+  }
+
+  return value;
+}
+
+function serializeArgs(args: any, inputs: readonly ParamType[]): Record<string, any> {
+  return Object.fromEntries(
+    inputs.map((input, index) => [
+      input.name || String(index),
+      serializeValue(args[index], input),
+    ])
+  );
 }
 
 export class ExamVaultIndexer {
@@ -106,69 +133,71 @@ export class ExamVaultIndexer {
       }
     }
 
-    // Process all logs and state updates inside a single transactional batch
-    await this.prisma.$transaction(async (tx: any) => {
-      for (const log of logs) {
-        let parsed: ethers.LogDescription | null = null;
-        try {
-          parsed = this.iface.parseLog({
-            topics: log.topics as string[],
-            data: log.data,
-          });
-        } catch {
-          // Unrecognized event log, ignore
-          continue;
-        }
+    if (logs.length > 0) {
+      // Process all logs and state updates inside a single transactional batch
+      await this.prisma.$transaction(async (tx: any) => {
+        for (const log of logs) {
+          let parsed: ethers.LogDescription | null = null;
+          try {
+            parsed = this.iface.parseLog({
+              topics: log.topics as string[],
+              data: log.data,
+            });
+          } catch {
+            // Unrecognized event log, ignore
+            continue;
+          }
 
-        if (!parsed) continue;
+          if (!parsed) continue;
 
-        const timestamp = await getBlockTime(log.blockNumber, this.provider);
-        const examIdStr = parsed.args.examId
-          ? parsed.args.examId.toString()
-          : null;
-        const actor =
-          parsed.args.account ||
-          parsed.args.setter ||
-          parsed.args.holder ||
-          parsed.args.authority ||
-          parsed.args.auditor ||
-          parsed.args.centre ||
-          null;
+          const timestamp = await getBlockTime(log.blockNumber, this.provider);
+          const examIdStr = parsed.args.examId
+            ? parsed.args.examId.toString()
+            : null;
+          const actor =
+            parsed.args.account ||
+            parsed.args.setter ||
+            parsed.args.holder ||
+            parsed.args.authority ||
+            parsed.args.auditor ||
+            parsed.args.centre ||
+            null;
 
-        const payloadJson = serializeArgs(parsed.args);
+          const payloadJson = serializeArgs(parsed.args, parsed.fragment.inputs);
 
-        // Idempotently record ChainEvent
-        await tx.chainEvent.upsert({
-          where: {
-            txHash_logIndex: {
-              txHash: log.transactionHash,
-              logIndex: log.index,
+          // Idempotently record ChainEvent
+          await tx.chainEvent.upsert({
+            where: {
+              txHash_logIndex: {
+                txHash: log.transactionHash,
+                logIndex: log.index,
+              },
             },
-          },
-          create: {
-            blockNumber: BigInt(log.blockNumber),
-            logIndex: log.index,
-            txHash: log.transactionHash,
-            examId: examIdStr,
-            type: parsed.name,
-            actor: actor ? ethers.getAddress(actor) : null,
-            payloadJson,
-            blockTimestamp: timestamp,
-          },
-          update: {
-            blockNumber: BigInt(log.blockNumber),
-            examId: examIdStr,
-            type: parsed.name,
-            actor: actor ? ethers.getAddress(actor) : null,
-            payloadJson,
-            blockTimestamp: timestamp,
-          },
-        });
+            create: {
+              blockNumber: BigInt(log.blockNumber),
+              logIndex: log.index,
+              txHash: log.transactionHash,
+              examId: examIdStr,
+              type: parsed.name,
+              actor: actor ? ethers.getAddress(actor) : null,
+              payloadJson,
+              blockTimestamp: timestamp,
+            },
+            update: {
+              blockNumber: BigInt(log.blockNumber),
+              examId: examIdStr,
+              type: parsed.name,
+              actor: actor ? ethers.getAddress(actor) : null,
+              payloadJson,
+              blockTimestamp: timestamp,
+            },
+          });
 
-        // Dispatch to derived table handler
-        await handleEvent(parsed, log, tx, this.cfg);
-      }
-    });
+          // Dispatch to derived table handler
+          await handleEvent(parsed, log, tx, this.cfg);
+        }
+      });
+    }
 
     // Update state manager after transaction successfully commits
     this.stateManager.setLastProcessedBlock(toBlock);

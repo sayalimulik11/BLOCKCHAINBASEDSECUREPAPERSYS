@@ -192,6 +192,42 @@ describe("ExamVault Event Indexer (BE-07)", () => {
     contractAddress = await contract.getAddress();
   });
 
+  it("advances the checkpoint without opening a database transaction when no logs match", async () => {
+    const { db } = createInMemoryDb();
+    const stateDir = fs.mkdtempSync(path.join(os.tmpdir(), "sigil-empty-indexer-test-"));
+    let transactionCount = 0;
+    const transaction = db.$transaction;
+    db.$transaction = async (callback: any) => {
+      transactionCount++;
+      return transaction(callback);
+    };
+    const latestBlock = await provider.getBlockNumber();
+    const testConfig: Config = {
+      PORT: 4000,
+      NODE_ENV: "test",
+      RPC_URL: "http://127.0.0.1:8545",
+      CHAIN_ID: 31337,
+      CONTRACT_ADDRESS: ethers.Wallet.createRandom().address,
+      DEPLOY_BLOCK: 0,
+      DATABASE_URL: "postgresql://mock",
+      SESSION_SECRET: "secret-key-at-least-32-characters-long",
+      FRONTEND_ORIGIN: "http://localhost:5173",
+      BLOB_DIR: stateDir,
+    };
+
+    try {
+      const stateManager = new IndexerStateManager(stateDir);
+      const indexer = new ExamVaultIndexer(testConfig, provider, db, stateManager);
+      const result = await indexer.processToBlock(latestBlock);
+
+      expect(result.processedLogs).toBe(0);
+      expect(transactionCount).toBe(0);
+      expect(stateManager.getLastProcessedBlock(0)).toBe(latestBlock);
+    } finally {
+      fs.rmSync(stateDir, { recursive: true, force: true });
+    }
+  });
+
   afterAll(() => {
     if (tempBlobDir && fs.existsSync(tempBlobDir)) {
       fs.rmSync(tempBlobDir, { recursive: true, force: true });

@@ -1416,7 +1416,14 @@ export interface paths {
                                 examId: string | null;
                                 type: string;
                                 actor: string | null;
-                                /** @description Event arguments keyed by their ABI parameter names. For ParticipantRegistered: { account, role, profileHash }. */
+                                /**
+                                 * @description Event arguments keyed by their ABI parameter names. For ParticipantRegistered: { account, role, profileHash }.
+                                 * @example {
+                                 *       "account": "0x0000000000000000000000000000000000000001",
+                                 *       "role": "1",
+                                 *       "profileHash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                                 *     }
+                                 */
                                 payloadJson: {
                                     [key: string]: unknown;
                                 };
